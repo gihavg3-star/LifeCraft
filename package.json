@@ -13,5 +13,8 @@
     "claymorphism"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/speed-insights": "^2.1.0"
+  }
 }
