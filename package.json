@@ -1,0 +1,17 @@
+{
+  "name": "lifecraft",
+  "version": "1.0.0",
+  "description": "LifeCraft - Gamified Habit-building PWA in Arabic with 3D effects",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y http-server -p 8080 -o"
+  },
+  "keywords": [
+    "pwa",
+    "gamification",
+    "habits",
+    "claymorphism"
+  ],
+  "author": "",
+  "license": "ISC"
+}

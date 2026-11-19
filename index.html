@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LifeCraft — اصنع نظامك اليومي الحقيقي</title>
+  <meta name="description" content="LifeCraft هو إطار عمل ذكي يناقشك في عاداتك الحقيقية، يوثّق إنجازاتك، ويبني هويتك الانضباطية لبنة لبنة.">
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#E5A93B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="LifeCraft">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Translations -->
+  <script src="translations.js"></script>
+</head>
+<body>
+
+  <!-- Architectural Background Grid -->
+  <div class="bg-decorations">
+    <div class="blueprint-grid"></div>
+  </div>
+
+  <!-- ====================== IMMERSIVE DASHBOARD LAYOUT ====================== -->
+  <div class="dashboard-container">
+
+    <!-- ====================== FULL-WIDTH HEADER PANEL ====================== -->
+    <header class="dashboard-header">
+      <!-- Left: Title & Branding -->
+      <div class="header-branding">
+        <h1 class="logo-text" data-i18n="title">LifeCraft</h1>
+        <span class="logo-tagline" data-i18n="description">اصنع نظامك اليومي الحقيقي</span>
+      </div>
+
+      <!-- Center: XP Progress Bar -->
+      <div class="header-xp-section">
+        <div class="xp-label-row">
+          <span class="xp-label" data-i18n="xp_progress">تقدّم الهوية</span>
+          <span class="xp-text" id="xp-display">٠ / ٥٠ XP</span>
+        </div>
+        <div class="xp-progress-bar">
+          <div class="xp-fill" id="xp-progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Right: Session Button & Language Toggle -->
+      <div class="header-actions">
+        <button class="session-quick-btn" id="session-quick-btn">
+          <span class="session-btn-icon">⚡</span>
+          <span class="session-btn-text" data-i18n="current_session">جلسة التركيز الحالية</span>
+        </button>
+        <button class="lang-toggle-btn" id="lang-toggle">EN</button>
+      </div>
+    </header>
+
+    <!-- ====================== MAIN TWIN-COLUMNS CONSOLE ====================== -->
+    <main class="dashboard-main">
+
+      <!-- ====================== RIGHT COLUMN: DISCIPLINE VISION ====================== -->
+      <div class="console-column console-right">
+
+        <!-- Video Identity Card -->
+        <div class="identity-video-card" id="identity-video-card">
+          <div class="video-card-header">
+            <h2 class="video-card-title" data-i18n="identity_title">هوية انضباطك</h2>
+            <span class="stage-tag" id="diorama-stage-tag" data-i18n="stage_tag">المرحلة ١: حجر الأساس 📐</span>
+          </div>
+          <div class="video-container">
+            <video id="growth-video" autoplay loop muted playsinline controls>
+              <source src="intro.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <!-- Atomic Habits Watcher -->
+          <div class="atomic-watcher-compact">
+            <div class="atomic-watcher-info">
+              <div class="atomic-watcher-title" data-i18n="watcher_title">🔥 رقيب العادات الذرية</div>
+              <div class="atomic-watcher-desc" data-i18n="watcher_desc">تفعيل الرقيب الصارم</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="atomic-watcher-toggle">
+              <span class="toggle-slider"></span>
+              <span class="toggle-circle"></span>
+            </label>
+          </div>
+
+          <!-- Stats Pills -->
+          <div class="stats-pills-row">
+            <div class="stat-pill">
+              <span class="stat-pill-icon">🔥</span>
+              <div>
+                <span class="stat-pill-val" id="streak-val">٠</span>
+                <span class="stat-pill-label" data-i18n="streak_label">يوم متواصل</span>
+              </div>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-icon">📋</span>
+              <div>
+                <span class="stat-pill-val" id="sessions-val">٠</span>
+                <span class="stat-pill-label" data-i18n="sessions_label">جلسة موثّقة</span>
+              </div>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-icon">⚡</span>
+              <div>
+                <span class="stat-pill-val" id="level-val">١</span>
+                <span class="stat-pill-label" data-i18n="level_label">المستوى</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Identity Pools -->
+          <div class="identity-pools-compact">
+            <h3 class="identity-pools-title" data-i18n="identity_pools_title">عدادات الهوية</h3>
+            <div id="identity-pools-container" class="identity-pools-container">
+              <!-- Dynamically populated -->
+            </div>
+            <p class="identity-subtext" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-top: 12px; font-style: italic;" data-i18n="identity_pools_desc">تغيير السلوك هو تغيير الهوية</p>
+          </div>
+        </div>
+
+        <!-- Atomic Discipline Network -->
+        <div class="atomic-network-card">
+          <div class="card-header">
+            <h3 class="card-title" data-i18n="atomic_network_title">شبكة الالتزام الذري</h3>
+          </div>
+
+          <!-- Analytics Header -->
+          <div class="atomic-analytics-header">
+            <div class="analytics-stat">
+              <span class="analytics-label" data-i18n="current_streak">السلسلة الحالية</span>
+              <span class="analytics-value" id="current-streak">٠</span>
+            </div>
+            <div class="analytics-stat">
+              <span class="analytics-label" data-i18n="longest_streak">أطول سلسلة</span>
+              <span class="analytics-value" id="longest-streak">٠</span>
+            </div>
+            <div class="analytics-stat">
+              <span class="analytics-label" data-i18n="total_days">أيام مكتملة</span>
+              <span class="analytics-value" id="total-days">٠</span>
+            </div>
+          </div>
+
+          <!-- Filter Dropdown -->
+          <div class="atomic-filter-row">
+            <label class="field-label" for="filter-habit" data-i18n="filter_habit_label">تصفية حسب العادة:</label>
+            <select id="filter-habit">
+              <option value="all" data-i18n="filter_all">جميع العادات</option>
+            </select>
+          </div>
+
+          <!-- Atomic Network Grid -->
+          <div id="atomic-network-grid" class="atomic-network-grid">
+            <!-- Dynamically populated with 365 cells -->
+          </div>
+
+          <!-- Legend -->
+          <div class="atomic-legend">
+            <div class="legend-item">
+              <span class="legend-cell status-none"></span>
+              <span class="legend-label" data-i18n="legend_none">لا بيانات</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-cell status-low"></span>
+              <span class="legend-label" data-i18n="legend_low">منخفض</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-cell status-medium"></span>
+              <span class="legend-label" data-i18n="legend_medium">متوسط</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-cell status-high"></span>
+              <span class="legend-label" data-i18n="legend_high">ممتاز</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ====================== LEFT COLUMN: HABIT LABORATORY ====================== -->
+      <div class="console-column console-left">
+
+        <!-- Habits Section -->
+        <div class="habits-lab-section">
+          <div class="lab-header">
+            <h3 class="lab-title" data-i18n="habits_section">إطار عاداتي الحقيقية</h3>
+            <button class="add-habit-btn" id="toggle-habits-form" data-i18n="add_habit_btn">+ إضافة عادة</button>
+          </div>
+
+          <!-- Add Habit Form (Collapsible) -->
+          <div class="habit-add-form hidden" id="habit-add-form">
+            <div class="habit-stacking-formula">
+              <div class="stacking-row">
+                <div class="form-field stacking-field" style="flex:1">
+                  <label class="field-label" for="new-habit-current" data-i18n="habit_current_label">العادة الحالية (بعد أن...)</label>
+                  <input type="text" id="new-habit-current"
+                    placeholder="مثال: أصب كوب قهوتي الصباحي، أستيقظ من النوم، أنهي الغداء..." data-i18n-placeholder="habit_current_placeholder">
+                </div>
+                <div class="stacking-connector">
+                  <span class="connector-text" data-i18n="habit_stacking_arrow">➔</span>
+                </div>
+                <div class="form-field stacking-field" style="flex:1">
+                  <label class="field-label" for="new-habit-new" data-i18n="habit_new_label">العادة الجديدة (سأقوم بـ...)</label>
+                  <input type="text" id="new-habit-new"
+                    placeholder="مثال: البرمجة لمدة ساعة، القراءة لمدة 30 دقيقة، التأمل..." data-i18n-placeholder="habit_new_placeholder">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field" style="flex:1">
+                <label class="field-label" for="new-habit-duration" data-i18n="habit_duration_label">الهدف (دق)</label>
+                <input type="number" id="new-habit-duration" value="45" min="1" max="480">
+              </div>
+              <div class="form-field" style="flex:1">
+                <label class="field-label" for="new-habit-identity" data-i18n="habit_identity_label">الهوية التي تبنيها هذه العادة</label>
+                <input type="text" id="new-habit-identity"
+                  placeholder="مثال: مبرمج محترف، شخص رياضي، كاتب مبدع، قائد فريق..." data-i18n-placeholder="habit_identity_placeholder">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field" style="flex:1">
+                <label class="field-label" for="new-habit-why" data-i18n="habit_why_label">لماذا هذه العادة مهمة لك؟</label>
+                <input type="text" id="new-habit-why"
+                  placeholder="الغرض منها يقوّي الالتزام بها..." data-i18n-placeholder="habit_why_placeholder">
+              </div>
+            </div>
+            <button class="btn btn-primary" id="add-habit-btn" style="height:48px;font-size:1rem;">
+              <span class="btn-text" data-i18n="add_habit_submit">إضافة العادة إلى إطاري</span>
+            </button>
+          </div>
+
+          <!-- Habits List (Accordion Style) -->
+          <div id="habits-list" class="habits-list-accordion">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Active Session Card -->
+        <div class="session-card" id="session-section">
+          <!-- Card Main Header -->
+          <h2 class="session-card-main-header" style="text-align: center; color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 16px;" data-i18n="current_session">جلسة التركيز الحالية</h2>
+          <!-- Card Top Header -->
+          <div class="session-card-header">
+            <div class="xp-badge">XP 10+</div>
+            <div class="stage-badge" data-i18n="session_stage_badge">△ المرحلة 1: حجر الأساس</div>
+          </div>
+
+          <!-- Habit Selection -->
+          <div class="session-field">
+            <label class="field-label" data-i18n="habit_selector_label">العادة التي تعمل عليها الآن:</label>
+            <select id="habit-selector">
+              <option value="" disabled selected data-i18n="select_habit">— اختر عادة من قائمتك —</option>
+            </select>
+
+            <!-- Custom habit input (hidden until user selects Custom Habit...) -->
+            <div id="custom-habit-group" class="session-field hidden" style="margin-top:8px;">
+              <label class="field-label" for="custom-habit-input" data-i18n="custom_habit_label">عادة مخصصة...</label>
+              <input type="text" id="custom-habit-input" placeholder="" data-i18n-placeholder="custom_habit_placeholder" />
+            </div>
+          </div>
+
+          <!-- Environment Cue Notification -->
+          <div class="environment-cue-notification hidden" id="environment-cue">
+            <div class="environment-cue-icon">🌍</div>
+            <div class="environment-cue-content">
+              <div class="environment-cue-title" data-i18n="environment_cue_title">تذكير بيئي</div>
+              <div class="environment-cue-text" id="environment-cue-text"></div>
+            </div>
+            <button class="environment-cue-dismiss" id="environment-cue-dismiss">✕</button>
+          </div>
+
+          <!-- Session Objective Input -->
+          <div class="session-field" id="session-goal-group">
+            <label class="field-label" data-i18n="session_goal_label">ما هدفك لهذه الجلسة؟</label>
+            <textarea id="session-goal-input" rows="2"
+              placeholder="مثال: إنهاء واجهة المستخدم للصفحة الرئيسية، أو حفظ الفصل الثالث..." data-i18n-placeholder="session_goal_placeholder"></textarea>
+            <span class="field-hint" data-i18n="goal_hint">حدد هدفك قبل البدء — هذا يرفع جودة الجلسة بشكل كبير</span>
+          </div>
+
+          <!-- Optional Timer -->
+          <div class="session-field" id="optional-timer-group">
+            <div class="timer-row">
+              <span class="field-label" data-i18n="optional_timer_label">تفعيل المؤقت (اختياري)</span>
+              <label class="toggle-switch" style="margin-left: auto;">
+                <input type="checkbox" id="timer-toggle">
+                <span class="toggle-slider"></span>
+                <span class="toggle-circle"></span>
+              </label>
+            </div>
+            <div class="timer-row" id="duration-controls-row" style="margin-top: 8px;">
+              <div class="duration-controls" style="margin-left: auto; align-items: center; display: flex; gap:8px;">
+                <!-- Advanced duration input: numeric value + unit toggle (minutes / hours) -->
+                <input type="number" id="dur-number" min="1" max="240" value="2" style="width:80px;text-align:center;padding:6px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);" />
+                <select id="dur-unit" style="height:34px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);padding:4px 8px;">
+                  <option value="min" data-i18n="minutes_abbr">دق</option>
+                  <option value="hr">ساعات</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Timer Ring (shown only when timer is enabled and running) -->
+            <div class="timer-section hidden" id="timer-section">
+              <svg class="timer-ring" width="110" height="110">
+                <circle class="timer-ring-bg" stroke="rgba(229,169,59,0.15)" stroke-width="7" fill="transparent" r="46" cx="55" cy="55"/>
+                <circle class="timer-ring-progress" id="timer-progress" stroke="#E5A93B" stroke-width="7" fill="transparent" r="46" cx="55" cy="55"/>
+              </svg>
+              <div class="timer-text" id="timer-display">30:00</div>
+            </div>
+          </div>
+
+          <!-- Primary Action Button -->
+          <button class="btn btn-primary btn-full" id="start-btn">
+            <span class="btn-icon">▶</span>
+            <span class="btn-text" data-i18n="start_session_btn">ابدأ الجلسة</span>
+          </button>
+
+          <!-- Slack Button -->
+          <button class="btn btn-ghost btn-full" id="slack-btn" style="margin-top: 8px;">
+            <span class="btn-text" data-i18n="slack_session_btn">تقاعست</span>
+          </button>
+
+          <!-- Cancel Button (Hidden by default) -->
+          <button class="btn btn-ghost btn-full hidden" id="cancel-btn">
+            <span class="btn-text" data-i18n="cancel_session_btn">إيقاف الجلسة</span>
+          </button>
+
+          <!-- Session Completion (Hidden by default) -->
+          <div class="session-completion hidden" id="session-completion">
+            <h3 class="completion-title" data-i18n="session_complete">جلسة مكتملة!</h3>
+            <p class="completion-desc" data-i18n="session_complete_desc">وثّق ما أنجزته بالتفصيل</p>
+            <textarea id="accomplishment-log-input" rows="3"
+              placeholder="مثال: برمجت نظام المصادقة..."></textarea>
+            <div class="xp-added-alert">+١٠ نقطة هوية</div>
+            <button class="btn btn-primary btn-full" id="collect-btn" disabled>
+              <span class="btn-text">تأكيد وحفظ الإنجاز ✍️</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Weekly Planning & Vision Board -->
+    <section class="weekly-plan-card" id="weekly-plan-card">
+      <div class="weekly-plan-header">
+        <div class="weekly-plan-title-block">
+          <h3 class="weekly-plan-title" data-i18n="weekly_plan_title">نظام التخطيط الأسبوعي ورؤية الأهداف</h3>
+          <p class="weekly-plan-motivation" data-i18n="weekly_plan_quote">ما يمكنك تحقيقه في 12 أسبوعاً سيدهشك.. أفعالك هي مرآة نتائجك!</p>
+        </div>
+        <div class="weekly-plan-progress-shell">
+          <div class="weekly-plan-progress-labels">
+            <span class="weekly-plan-progress-label" data-i18n="weekly_plan_progress_label">التقدم الأسبوعي</span>
+            <strong id="weekly-plan-progress-text">٠٪</strong>
+          </div>
+          <div class="weekly-plan-progress-bar">
+            <div class="weekly-plan-progress-fill" id="weekly-plan-progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="weekly-plan-body">
+        <div class="weekly-plan-vision-panel">
+          <div class="weekly-plan-vision-top">
+            <span class="weekly-plan-vision-badge" data-i18n="weekly_plan_vision_label">رؤية هذا الأسبوع</span>
+            <span class="weekly-plan-vision-accent">✦</span>
+          </div>
+          <label class="weekly-plan-section-label" for="weekly-plan-vision" data-i18n="weekly_plan_vision_label">رؤية الأسبوع وهدفه الأكبر</label>
+          <textarea id="weekly-plan-vision" rows="6" data-i18n-placeholder="weekly_plan_vision_placeholder" placeholder="اكتب رؤيتك لهذا الأسبوع..."></textarea>
+        </div>
+
+        <div class="weekly-plan-day-grid" id="weekly-plan-days-grid"></div>
+      </div>
+    </section>
+
+    <!-- ====================== HORIZONTAL CONSOLE LOG ====================== -->
+    <footer class="console-log-footer">
+      <div class="console-log-header">
+        <span class="console-log-icon">📖</span>
+        <span class="console-log-title" data-i18n="history_section">سجل إنجازاتي الحقيقية</span>
+        <button class="console-log-clear" id="clear-history-btn" data-i18n="clear_history_btn">مسح السجل</button>
+      </div>
+      <div id="history-logs-feed" class="console-log-feed">
+        <!-- Dynamically populated -->
+      </div>
+    </footer>
+
+    <aside class="ad-slot hidden" id="ad-slot" hidden aria-labelledby="ad-slot-label">
+      <span class="ad-slot-label" id="ad-slot-label" data-i18n="ad_slot_label">مساحة إعلانية</span>
+      <div class="ad-slot-content" id="ad-slot-content"></div>
+    </aside>
+
+  </div>
+
+  <!-- Confetti -->
+  <div class="confetti-container" id="confetti-container"></div>
+
+  <!-- Level Up Modal -->
+  <div class="level-up-overlay hidden" id="level-up-overlay">
+    <div class="level-up-card-wrapper">
+      <div class="level-up-card">
+        <div class="sparkles">✨</div>
+        <h2 class="level-up-title" data-i18n="level_up_title">ارتقيت لمستوى جديد! 🎉</h2>
+        <div class="level-badge-large">
+          <span class="lvl-label" data-i18n="level_label">المستوى</span>
+          <span class="lvl-num" id="modal-level-num">٢</span>
+        </div>
+        <p class="level-up-desc" id="level-up-desc" data-i18n="level_up_desc">هويتك الانضباطية في تصاعد مستمر.</p>
+        <button class="btn btn-primary" id="level-up-close-btn">
+          <span class="btn-text" data-i18n="continue_btn">استمر في البناء</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== REFLECTION DIALOG (replaces Discipline Camp) ====================== -->
+  <div class="reflection-overlay hidden" id="reflection-overlay">
+    <div class="reflection-card-wrapper">
+      <div class="reflection-card">
+
+        <!-- Step 1: Acknowledge -->
+        <div class="reflection-step" id="ref-step-1">
+          <div class="ref-avatar">🔍</div>
+          <h2 class="ref-title" data-i18n="reflection_title">تشخيص اليوم</h2>
+          <p class="ref-text" data-i18n="reflection_intro">
+            لم تتمكن من الالتزام بعادتك اليوم — هذا يحدث لكل إنسان. الفارق الحقيقي هو ماذا تفعل بعد ذلك.
+          </p>
+          <div class="ref-question-box" data-i18n="reflection_quote">
+            "الانضباط ليس الكمال، بل هو القدرة على العودة بعد التوقف دون استسلام أو تبرير."
+          </div>
+          <div class="ref-footer-btns">
+            <button class="btn btn-primary" id="ref-next-1">
+              <span class="btn-text" data-i18n="reflection_start">أريد تشخيص ما حدث ⚙️</span>
+            </button>
+            <button class="btn btn-ghost" id="ref-close-btn" data-i18n="reflection_close">إغلاق والمحاولة غداً</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Root Cause Analysis -->
+        <div class="reflection-step hidden" id="ref-step-2">
+          <div class="ref-avatar">🛠️</div>
+          <h2 class="ref-title" data-i18n="reflection_step2_title">تحليل السبب الجذري</h2>
+          <p class="ref-text" data-i18n="reflection_step2_desc">
+            ما الذي أعاق جلستك اليوم؟ لا يوجد إجابة خاطئة — الهدف هو فهم نمط المقاومة.
+          </p>
+
+          <div class="barrier-options">
+            <button class="barrier-chip" data-val="distraction" data-i18n="barrier_distracted">📱 تشتت وإلهاء</button>
+            <button class="barrier-chip" data-val="energy" data-i18n="barrier_tired">😴 إرهاق وقلة طاقة</button>
+            <button class="barrier-chip" data-val="unclear" data-i18n="barrier_unclear">🤔 الهدف غير واضح</button>
+            <button class="barrier-chip" data-val="environment" data-i18n="barrier_environment">🌍 البيئة غير مهيأة</button>
+            <button class="barrier-chip" data-val="emotion" data-i18n="barrier_emotion">💭 عقبة نفسية أو قلق</button>
+            <button class="barrier-chip" data-val="time" data-i18n="barrier_time">⏰ ضغط الوقت</button>
+          </div>
+
+          <div class="ref-input-group" style="margin-top:12px;">
+            <label class="field-label" for="barrier-detail" data-i18n="barrier_detail_label">صِف ما حدث بكلماتك الخاصة:</label>
+            <textarea id="barrier-detail" rows="2" placeholder="كنت أنوي... لكن حدث..." data-i18n-placeholder="barrier_detail_placeholder"></textarea>
+          </div>
+
+          <button class="btn btn-primary" id="ref-next-2">
+            <span class="btn-text" data-i18n="reflection_step2_next">انتقل للحل →</span>
+          </button>
+        </div>
+
+        <!-- Step 3: 2-Minute Rescue Action -->
+        <div class="reflection-step hidden" id="ref-step-3">
+          <div class="ref-avatar">⚡</div>
+          <h2 class="ref-title" data-i18n="reflection_step3_title">قاعدة الدقيقتين</h2>
+          <p class="ref-text" data-i18n="reflection_step3_desc">
+            لا تكسر السلسلة تماماً. نفّذ الآن إجراءاً صغيراً واحداً — <strong>لا يتجاوز دقيقتين</strong> — يثبت أن هويتك لم تُهزم.
+          </p>
+          <div class="ref-question-box" style="border-color:#4BD37F;background:rgba(75,211,127,0.05);color:#A5F3C2;" data-i18n="reflection_step3_hint">
+            الهدف ليس الإنجاز الكامل، بل الحفاظ على طقس البداية وعدم كسر السلسلة.
+          </div>
+          <div class="ref-examples-grid">
+            <span class="example-chip" data-i18n="example1">📝 اكتب سطراً واحداً من كودك</span>
+            <span class="example-chip" data-i18n="example2">📖 اقرأ صفحة واحدة</span>
+            <span class="example-chip" data-i18n="example3">🖊️ افتح الملف الذي تعمل عليه</span>
+            <span class="example-chip" data-i18n="example4">🎯 ارسم مخططاً للخطوة التالية</span>
+          </div>
+          <div class="rescue-timer-container">
+            <div class="rescue-timer-text" id="rescue-timer-display">٠٢:٠٠</div>
+            <span style="font-size:0.75rem;color:var(--text-muted);" data-i18n="countdown_label">العداد التنازلي</span>
+          </div>
+          <div class="ref-footer-btns">
+            <button class="btn btn-primary" id="rescue-confirm-btn">
+              <span class="btn-text" data-i18n="rescue_confirm">نفّذت الإجراء المصغّر ✅</span>
+            </button>
+            <button class="btn btn-ghost" id="rescue-skip-btn" data-i18n="rescue_skip">تخطّ إلى التعهد</button>
+          </div>
+        </div>
+
+        <!-- Step 4: System Redesign -->
+        <div class="reflection-step hidden" id="ref-step-4">
+          <div class="ref-avatar">🔧</div>
+          <h2 class="ref-title" style="color:#FFE66D;" data-i18n="reflection_step4_title">إعادة هندسة النظام</h2>
+          <p class="ref-text" data-i18n="reflection_step4_desc">
+            أنت لا تفشل في الإرادة — أنت تفشل في <strong>التصميم</strong>. غيّر شيئاً واحداً في بيئتك أو جدولك لجعل العادة أسهل غداً.
+          </p>
+
+          <div class="system-redesign-group">
+            <label class="field-label" for="system-change" data-i18n="environment_change_label">ما التعديل المادي الفعلي الذي أجريته في غرفتك أو مكتبك لتسهيل العادة غداً؟</label>
+            <textarea id="system-change" rows="2"
+              placeholder="مثال: وضعت الكتاب فوق الوسادة، فصلت جهاز الألعاب، وضعت الكمبيوتر مفتوحاً على مشروعي..." data-i18n-placeholder="environment_change_placeholder"></textarea>
+            <span class="field-hint" data-i18n="environment_change_hint">اجعلها سهلة - التعديل المادي يقلل الاحتكاك ويجعل البدء تلقائياً</span>
+          </div>
+
+          <button class="btn btn-primary" id="ref-next-4" disabled style="opacity:0.5;cursor:not-allowed;">
+            <span class="btn-text" data-i18n="reflection_step4_next">التزمت بهذا التغيير →</span>
+          </button>
+        </div>
+
+        <!-- Step 5: Commitment Pledge -->
+        <div class="reflection-step hidden" id="ref-step-5">
+          <div class="ref-avatar">📜</div>
+          <h2 class="ref-title" style="color:#E5A93B;" data-i18n="reflection_step5_title">تعهد الغد</h2>
+          <p class="ref-text" data-i18n="reflection_step5_desc">
+            لا تفوّت مرتين متتاليتين — هذه هي القاعدة الذهبية للبناء المتراكم. اكتب تعهداً واضحاً لغد أفضل.
+          </p>
+          <div class="ref-input-group">
+            <label class="field-label" for="pledge-input" data-i18n="pledge_label">تعهدي لغداً:</label>
+            <textarea id="pledge-input" rows="2"
+              placeholder="غداً بعد الانتهاء من... سأجلس لمدة ... للعمل على ..." data-i18n-placeholder="pledge_placeholder"></textarea>
+          </div>
+          <button class="btn btn-primary" id="pledge-confirm-btn" disabled style="opacity:0.5;cursor:not-allowed;">
+            <span class="btn-text" data-i18n="pledge_confirm">أوقّع تعهدي وأغلق اليوم ✍️</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== HABIT CONTRACT LOCK (Emergency Lock) ====================== -->
+  <div class="contract-lock-overlay hidden" id="contract-lock-overlay">
+    <div class="contract-lock-wrapper">
+      <div class="contract-lock-card">
+        <div class="contract-header">
+          <div class="contract-seal">⚖️</div>
+          <h2 class="contract-title" data-i18n="contract_lock_title">وثيقة عقد العادات القانونية</h2>
+          <div class="contract-subtitle" data-i18n="contract_lock_subtitle">قفل الطوارئ - رقيب العادات الذرية</div>
+        </div>
+
+        <div class="contract-body">
+          <div class="contract-warning-banner">
+            <span class="warning-icon">⚠️</span>
+            <span class="warning-text" data-i18n="contract_warning">تجاوزت الموعد النهائي دون إتمام عادتك الواقعية</span>
+          </div>
+
+          <div class="contract-message">
+            <p class="contract-paragraph" data-i18n="contract_message_1">
+              لقد فشلت في الالتزام بالموعد الذي حددته لنفسك. هذا ليس مجرد تقاعس عادي — هذا انتهاك لثقتك بنفسك وللعقد الذي أبرمته مع هويتك الانضباطية.
+            </p>
+            <p class="contract-paragraph" data-i18n="contract_message_2">
+              كبرياؤك يُستحق أكثر من ذلك. أنت لست شخصاً يترك وعوده للرياح. أنت شخص انضباطي يلتزم بكلمته حتى عندما لا يريد ذلك.
+            </p>
+          </div>
+
+          <div class="contract-punishment">
+            <h3 class="punishment-title" data-i18n="punishment_title">العقوبة المفروضة:</h3>
+            <div class="punishment-item">
+              <span class="punishment-icon">🔒</span>
+              <span class="punishment-text" data-i18n="punishment_xp_freeze">تجميد كسب الـ XP العام لمدة يومين</span>
+            </div>
+            <div class="punishment-item">
+              <span class="punishment-icon">📋</span>
+              <span class="punishment-text" data-i18n="punishment_locked">قفل التطبيق حتى التوقيع الرقمي</span>
+            </div>
+          </div>
+
+          <div class="contract-signature-section">
+            <label class="field-label" for="contract-signature" data-i18n="signature_label">
+              اكتب الجملة التالية حرفياً لفك القفل:
+            </label>
+            <div class="required-phrase" data-i18n="required_phrase">
+              "أنا ألتزم بالظهور غداً وإصلاح نظامي الحياتي"
+            </div>
+            <textarea 
+              id="contract-signature" 
+              rows="3"
+              placeholder="اكتب الجملة أعلاه حرفياً..."
+              data-i18n-placeholder="signature_placeholder"
+            ></textarea>
+            <div class="signature-status" id="signature-status"></div>
+          </div>
+
+          <button class="btn btn-primary" id="contract-unlock-btn" disabled style="opacity:0.5;cursor:not-allowed;">
+            <span class="btn-text" data-i18n="unlock_contract_btn">توقيع وفك القفل ✍️</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px;"></div>
+
+  <!-- JavaScript -->
+  <!-- Cache-busted app script to ensure latest changes load in the browser -->
+  <script src="app.js?cb=20260719"></script>
+</body>
+</html>

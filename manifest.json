@@ -1,0 +1,28 @@
+{
+  "name": "LifeCraft - ابنِ حياتك خطوة بخطوة",
+  "short_name": "LifeCraft",
+  "description": "تطبيق لبناء العادات وتطوير الذات بأسلوب الألعاب التفاعلية ثلاثية الأبعاد.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFEBE0",
+  "theme_color": "#FF8A5B",
+  "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
