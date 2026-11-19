@@ -27,4 +27,4 @@
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/YOUR_USERNAME/LifeCraft.git](https://github.com/YOUR_USERNAME/LifeCraft.git)
+   git clone [https://github.com/YOUR_USERNAME/LifeCraft.git](https://github.com/gihavg3-star/LifeCraft.git)
