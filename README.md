@@ -23,8 +23,23 @@
 
 ---
 
-## 🚀 Getting Started
+## 🌐 فتح التطبيق واستخدامه
 
-1. Clone the repository:
+**[افتح LifeCraft مباشرةً](https://gihavg3-star.github.io/LifeCraft/)**
+
+يعمل التطبيق في المتصفحات الحديثة على Windows وLinux وmacOS وAndroid وiPhone وiPad. لا يحتاج إلى تثبيت لاستخدامه من الرابط. لإضافته إلى الشاشة الرئيسية:
+
+* **iPhone وiPad:** افتح الرابط في Safari، واضغط «مشاركة»، ثم «إضافة إلى الشاشة الرئيسية».
+* **Android:** افتح الرابط في Chrome واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».
+* **الحاسوب:** افتح الرابط في Chrome أو Edge أو متصفح يدعم تطبيقات الويب التقدمية، ثم اختر «تثبيت التطبيق» إن ظهر الخيار.
+
+تُحفظ بياناتك على الجهاز نفسه. بعد فتح التطبيق مرة واحدة مع الاتصال بالإنترنت، يمكن استخدام الواجهة دون اتصال.
+
+### تشغيل نسخة محلية
+
+1. استنسخ المستودع:
    ```bash
-   git clone [https://github.com/YOUR_USERNAME/LifeCraft.git](https://github.com/gihavg3-star/LifeCraft.git)
+   git clone https://github.com/gihavg3-star/LifeCraft.git
+   cd LifeCraft
+   npm run dev
+   ```

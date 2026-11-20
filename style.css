@@ -105,10 +105,13 @@ html, body {
 .dashboard-container {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   max-width: 1440px;
+  width: 100%;
+  min-width: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
   padding: 16px;
   align-items: start;
@@ -119,8 +122,9 @@ html, body {
 /* Full-Width Header Panel */
 .dashboard-header {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 20px;
+  min-width: 0;
   align-items: center;
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -183,14 +187,16 @@ html, body {
 /* Main Twin-Columns Console */
 .dashboard-main {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  min-width: 0;
 }
 
 .console-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .console-column::-webkit-scrollbar {
@@ -213,6 +219,7 @@ html, body {
 
 /* Right Column: Identity Video Card */
 .identity-video-card {
+  min-width: 0;
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -537,12 +544,14 @@ html, body {
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8px;
   align-items: stretch;
+  min-width: 0;
 }
 
 .weekly-plan-day-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
   background: rgba(255, 193, 7, 0.08);
   border: 1px solid rgba(255, 193, 7, 0.24);
   border-radius: 12px;
@@ -1365,11 +1374,11 @@ html, body {
 /* Responsive Design */
 @media (max-width: 1024px) {
   .dashboard-main {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   
   .dashboard-header {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
   
@@ -3014,13 +3023,49 @@ textarea:focus, input:focus {
   }
 }
 
+@media (max-width: 760px) {
+  .dashboard-container {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .dashboard-header {
+    padding: 16px;
+  }
+
+  .header-xp-section {
+    width: 100%;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
+
+  .session-quick-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .weekly-plan-day-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 480px) {
   .split-container { padding: 8px; gap: 10px; }
+  .dashboard-container { padding: 8px; gap: 10px; }
+  .dashboard-header { padding: 12px; }
+  .identity-video-card { padding: 12px; }
+  .video-card-header { flex-wrap: wrap; gap: 8px; }
+  .stage-tag { max-width: 100%; white-space: normal; }
+  .stats-pills-row { gap: 6px; }
+  .stat-pill { min-width: 0; padding: 8px 6px; gap: 4px; }
+  .weekly-plan-day-grid { grid-template-columns: minmax(0, 1fr); }
   .section-block { padding: 14px; }
   .card-face { padding: 16px; }
   .form-row { flex-direction: column; }
   .diorama-stats-row { gap: 6px; }
-  .stat-pill { padding: 8px 10px; }
+  input, select, textarea { font-size: 16px; }
 }
 
 /* ====================== DIORAMA FAILURE ALARM ====================== */
@@ -3301,10 +3346,12 @@ textarea:focus, input:focus {
 
 .atomic-network-grid {
   display: grid;
-  grid-template-columns: repeat(53, 1fr);
+  grid-template-columns: repeat(53, minmax(12px, 1fr));
   gap: 3px;
   margin-bottom: 14px;
   padding: 12px;
+  width: 100%;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: 12px;

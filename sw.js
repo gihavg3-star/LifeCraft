@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifecraft-cache-v10';
+const CACHE_NAME = 'lifecraft-cache-v11';
 const CACHE_PREFIX = 'lifecraft-cache-';
 const ASSETS_TO_CACHE = [
   './',
