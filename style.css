@@ -1443,7 +1443,8 @@ html, body {
 
 .video-container {
   width: 100%;
-  aspect-ratio: 1 / 0.9;
+  aspect-ratio: 16 / 10;
+  max-height: min(45vh, 400px);
   background: linear-gradient(135deg, #0A0D15 0%, #111826 100%);
   border-radius: 12px;
   overflow: hidden;

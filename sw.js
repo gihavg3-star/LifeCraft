@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifecraft-cache-v11';
+const CACHE_NAME = 'lifecraft-cache-v12';
 const CACHE_PREFIX = 'lifecraft-cache-';
 const ASSETS_TO_CACHE = [
   './',
@@ -8,7 +8,7 @@ const ASSETS_TO_CACHE = [
   './translations.js',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.jpg'
 ];
 
 self.addEventListener('install', (event) => {
