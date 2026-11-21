@@ -2611,11 +2611,13 @@ function updateAdSlotVisibility() {
   const content = document.getElementById('ad-slot-content');
   const contractOverlay = document.getElementById('contract-lock-overlay');
   const hasLoadedAd = slot.dataset.adLoaded === 'true' && Boolean(content?.childElementCount);
+  const isLoadingAd = !hasLoadedAd && Boolean(content?.querySelector('[data-ad-provider-frame]'));
   const contractIsOpen = contractOverlay && !contractOverlay.classList.contains('hidden');
   const shouldShow = hasLoadedAd && navigator.onLine && !window.app?.isRunning && !contractIsOpen;
 
-  slot.hidden = !shouldShow;
-  slot.classList.toggle('hidden', !shouldShow);
+  slot.hidden = !shouldShow && !isLoadingAd;
+  slot.classList.toggle('hidden', !shouldShow && !isLoadingAd);
+  slot.classList.toggle('ad-slot-loading', isLoadingAd);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2627,15 +2629,123 @@ document.addEventListener('DOMContentLoaded', () => {
   const adSlot = document.getElementById('ad-slot');
   const contractOverlay = document.getElementById('contract-lock-overlay');
   if (adSlot) {
+    const adContent = document.getElementById('ad-slot-content');
+    const adProviderTemplate = document.getElementById('ad-provider-template');
+    let adFrame = null;
+
     // Ad integrations dispatch this only after successfully rendering into the slot.
-    document.addEventListener('lifecraft:ad-loaded', () => {
+    window.addEventListener('lifecraft:ad-loaded', () => {
       const content = document.getElementById('ad-slot-content');
       adSlot.dataset.adLoaded = String(Boolean(content?.childElementCount));
       updateAdSlotVisibility();
     });
 
-    window.addEventListener('online', updateAdSlotVisibility);
-    window.addEventListener('offline', updateAdSlotVisibility);
+    const loadAdProvider = () => {
+      if (!navigator.onLine || adFrame || !adContent || !adProviderTemplate) return;
+
+      adFrame = document.createElement('iframe');
+      adFrame.title = 'إعلان';
+      adFrame.width = '320';
+      adFrame.height = '50';
+      adFrame.dataset.adProviderFrame = '';
+      adFrame.setAttribute('sandbox', 'allow-scripts');
+      adFrame.referrerPolicy = 'no-referrer';
+      adFrame.srcdoc = `<!doctype html><html><head><meta name="referrer" content="no-referrer"></head><body style="margin:0"><script>
+        (() => {
+          let reported = false;
+          let loadTimeout;
+          const reportLoaded = () => {
+            if (reported) return;
+            reported = true;
+            clearTimeout(loadTimeout);
+            parent.postMessage({ type: 'lifecraft-ad-loaded', unit: '6217544' }, '*');
+          };
+          const inspectCreative = (creative) => {
+            const size = creative.getBoundingClientRect();
+            if (size.width < 300 || size.height < 40) return;
+            const source = creative.getAttribute('src');
+            if (source && source !== 'about:blank') {
+              reportLoaded();
+              return;
+            }
+            try {
+              const body = creative.contentDocument?.body;
+              if (body && (body.childElementCount > 0 || body.textContent.trim())) reportLoaded();
+            } catch (error) {
+              console.error('Unable to inspect the loaded ad frame:', error);
+            }
+          };
+          const observeCreative = (creative) => {
+            if (creative.dataset.lifecraftObserved) return;
+            creative.dataset.lifecraftObserved = 'true';
+            creative.addEventListener('load', () => inspectCreative(creative));
+            try {
+              const documentElement = creative.contentDocument?.documentElement;
+              if (documentElement) {
+                new MutationObserver(() => inspectCreative(creative))
+                  .observe(documentElement, { childList: true, subtree: true });
+              }
+            } catch (error) {
+              console.error('Unable to observe the loaded ad frame:', error);
+            }
+            inspectCreative(creative);
+          };
+          const observer = new MutationObserver(() => {
+            document.querySelectorAll('iframe').forEach(observeCreative);
+          });
+          observer.observe(document.documentElement, { childList: true, subtree: true });
+          document.addEventListener('load', (event) => {
+            if (event.target instanceof HTMLIFrameElement) observeCreative(event.target);
+          }, true);
+          document.addEventListener('error', (event) => {
+            const failedScript = event.target;
+            if (failedScript instanceof HTMLScriptElement && failedScript.src.startsWith('https://bauval.org/22/')) {
+              parent.postMessage({ type: 'lifecraft-ad-error', unit: '6217544' }, '*');
+            }
+          }, true);
+          loadTimeout = setTimeout(() => {
+            if (!reported) parent.postMessage({ type: 'lifecraft-ad-empty', unit: '6217544' }, '*');
+          }, 20000);
+        })();
+      <\/script>${adProviderTemplate.innerHTML}</body></html>`;
+
+      window.addEventListener('message', (event) => {
+        if (
+          event.source !== adFrame?.contentWindow ||
+          !event.data ||
+          event.data.unit !== adProviderTemplate.dataset.adUnitId
+        ) return;
+
+        if (event.data.type === 'lifecraft-ad-error' || event.data.type === 'lifecraft-ad-empty') {
+          if (event.data.type === 'lifecraft-ad-error') {
+            console.error('The ad provider script failed to load.');
+          } else {
+            console.warn('The ad provider did not return a banner.');
+          }
+          adFrame.remove();
+          adFrame = null;
+          updateAdSlotVisibility();
+          return;
+        }
+
+        if (event.data.type !== 'lifecraft-ad-loaded') return;
+        window.dispatchEvent(new Event('lifecraft:ad-loaded'));
+      });
+
+      adContent.replaceChildren(adFrame);
+    };
+
+    window.addEventListener('online', () => {
+      loadAdProvider();
+      updateAdSlotVisibility();
+    });
+    window.addEventListener('offline', () => {
+      if (adSlot.dataset.adLoaded !== 'true' && adFrame) {
+        adFrame.remove();
+        adFrame = null;
+      }
+      updateAdSlotVisibility();
+    });
 
     if (contractOverlay) {
       new MutationObserver(updateAdSlotVisibility).observe(contractOverlay, {
@@ -2644,6 +2754,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    loadAdProvider();
     updateAdSlotVisibility();
   }
 

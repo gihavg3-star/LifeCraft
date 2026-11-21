@@ -1346,6 +1346,16 @@ html, body {
   border-radius: 16px;
 }
 
+.ad-slot.ad-slot-loading {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: -10000px;
+  width: 320px;
+  min-height: 74px;
+  margin: 0;
+  visibility: hidden;
+}
+
 .ad-slot[hidden] {
   display: none !important;
 }
