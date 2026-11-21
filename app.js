@@ -2648,9 +2648,9 @@ document.addEventListener('DOMContentLoaded', () => {
       adFrame.width = '320';
       adFrame.height = '50';
       adFrame.dataset.adProviderFrame = '';
-      adFrame.setAttribute('sandbox', 'allow-scripts');
-      adFrame.referrerPolicy = 'no-referrer';
-      adFrame.srcdoc = `<!doctype html><html><head><meta name="referrer" content="no-referrer"></head><body style="margin:0"><script>
+      adFrame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox');
+      adFrame.referrerPolicy = 'strict-origin-when-cross-origin';
+      adFrame.srcdoc = `<!doctype html><html><head></head><body style="margin:0"><script>
         (() => {
           let reported = false;
           let loadTimeout;
