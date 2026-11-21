@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifecraft-cache-v18';
+const CACHE_NAME = 'lifecraft-cache-v19';
 const CACHE_PREFIX = 'lifecraft-cache-';
 const ASSETS_TO_CACHE = [
   './',
@@ -14,9 +14,11 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(
-        ASSETS_TO_CACHE.map((asset) => new Request(new URL(asset, self.registration.scope), { cache: 'reload' }))
-      ))
+      .then((cache) => cache.addAll(ASSETS_TO_CACHE.map((asset) => {
+        const url = new URL(asset, self.registration.scope);
+        url.searchParams.set('cache', CACHE_NAME);
+        return new Request(url, { cache: 'reload' });
+      }))
       .then(() => self.skipWaiting())
   );
 });
@@ -56,7 +58,7 @@ self.addEventListener('fetch', (event) => {
       return networkResponse;
     } catch (error) {
       if (event.request.mode === 'navigate') {
-        const offlinePage = await cache.match('./index.html');
+        const offlinePage = await cache.match('./index.html', { ignoreSearch: true });
         if (offlinePage) return offlinePage;
       }
       throw error;
