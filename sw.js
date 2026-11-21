@@ -18,7 +18,7 @@ self.addEventListener('install', (event) => {
         const url = new URL(asset, self.registration.scope);
         url.searchParams.set('cache', CACHE_NAME);
         return url.href;
-      }))
+      })))
       .then(() => self.skipWaiting())
   );
 });
