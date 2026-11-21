@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifecraft-cache-v17';
+const CACHE_NAME = 'lifecraft-cache-v18';
 const CACHE_PREFIX = 'lifecraft-cache-';
 const ASSETS_TO_CACHE = [
   './',
@@ -14,7 +14,9 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+      .then((cache) => cache.addAll(
+        ASSETS_TO_CACHE.map((asset) => new Request(new URL(asset, self.registration.scope), { cache: 'reload' }))
+      ))
       .then(() => self.skipWaiting())
   );
 });
