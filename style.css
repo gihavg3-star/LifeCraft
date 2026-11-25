@@ -1334,7 +1334,6 @@ html, body {
 .ad-slot {
   width: 100%;
   max-width: 980px;
-  min-height: 110px;
   margin: 14px auto 0;
   padding: 12px 16px;
   display: flex;
@@ -1344,10 +1343,6 @@ html, body {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: 16px;
-}
-
-.ad-slot.ad-slot-loading {
-  min-height: 110px;
 }
 
 .ad-slot[hidden] {
@@ -1362,8 +1357,6 @@ html, body {
 
 .ad-slot-content {
   display: flex;
-  min-height: 70px;
-  max-height: 250px;
   justify-content: center;
   align-items: center;
   overflow: hidden;
@@ -1373,6 +1366,8 @@ html, body {
   display: block;
   max-width: 100%;
   border: 0;
+  overflow: hidden;
+  background: transparent;
 }
 
 /* Responsive Design */
