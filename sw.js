@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifecraft-cache-v21';
+const CACHE_NAME = 'lifecraft-cache-v20';
 const CACHE_PREFIX = 'lifecraft-cache-';
 const ASSETS_TO_CACHE = [
   './',
@@ -38,12 +38,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  const requestUrl = new URL(event.request.url);
-  if (
-    event.request.method !== 'GET' ||
-    /(?:adsterra|highperformanceformat|effectivegatecpm|bauval)/i.test(requestUrl.hostname) ||
-    requestUrl.origin !== self.location.origin
-  ) return;
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);

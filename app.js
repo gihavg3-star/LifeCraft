@@ -2611,11 +2611,13 @@ function updateAdSlotVisibility() {
   const content = document.getElementById('ad-slot-content');
   const contractOverlay = document.getElementById('contract-lock-overlay');
   const hasLoadedAd = slot.dataset.adLoaded === 'true' && Boolean(content?.childElementCount);
+  const isLoadingAd = !hasLoadedAd && Boolean(content?.querySelector('[data-ad-provider-frame]'));
   const contractIsOpen = contractOverlay && !contractOverlay.classList.contains('hidden');
   const shouldShow = hasLoadedAd && navigator.onLine && !window.app?.isRunning && !contractIsOpen;
 
-  slot.hidden = !shouldShow;
-  slot.classList.toggle('hidden', !shouldShow);
+  slot.hidden = !shouldShow && !isLoadingAd;
+  slot.classList.toggle('hidden', !shouldShow && !isLoadingAd);
+  slot.classList.toggle('ad-slot-loading', isLoadingAd);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2628,79 +2630,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const contractOverlay = document.getElementById('contract-lock-overlay');
   if (adSlot) {
     const adContent = document.getElementById('ad-slot-content');
-    let activeAdProviderTemplate = null;
-    let activeAdLayout = null;
+    const adProviderTemplate = document.getElementById('ad-provider-template');
     let adFrame = null;
-    let adLoadTimeout = null;
-
-    const clearAdLoadTimeout = () => {
-      if (adLoadTimeout !== null) {
-        clearTimeout(adLoadTimeout);
-        adLoadTimeout = null;
-      }
-    };
 
     // Ad integrations dispatch this only after successfully rendering into the slot.
     window.addEventListener('lifecraft:ad-loaded', () => {
       const content = document.getElementById('ad-slot-content');
       adSlot.dataset.adLoaded = String(Boolean(content?.childElementCount));
-      clearAdLoadTimeout();
       updateAdSlotVisibility();
     });
 
-    window.addEventListener('message', (event) => {
-      if (
-        event.source !== adFrame?.contentWindow ||
-        !event.data ||
-        event.data.unit !== activeAdProviderTemplate?.dataset.adUnitId
-      ) return;
-
-      if (event.data.type === 'lifecraft-ad-error' || event.data.type === 'lifecraft-ad-empty') {
-        if (event.data.type === 'lifecraft-ad-error') {
-          console.error('The ad provider script failed to load.');
-        } else {
-          console.warn('The ad provider did not return a banner.');
-        }
-        clearAdLoadTimeout();
-        adFrame.remove();
-        adFrame = null;
-        updateAdSlotVisibility();
-        return;
-      }
-
-      if (event.data.type !== 'lifecraft-ad-loaded') return;
-      window.dispatchEvent(new Event('lifecraft:ad-loaded'));
-    });
-
-    const loadAdProvider = (forceReload = false) => {
-      if (!navigator.onLine || !adContent) return;
-
-      const isDesktop = window.matchMedia('(min-width: 1025px)').matches;
-      const nextTemplate = document.getElementById(
-        isDesktop ? 'desktop-ad-provider-template' : 'mobile-ad-provider-template'
-      );
-      if (!nextTemplate) return;
-
-      if (adFrame && activeAdProviderTemplate === nextTemplate) return;
-      if (!forceReload && activeAdLayout === nextTemplate.id) return;
-      if (adFrame) {
-        clearAdLoadTimeout();
-        adFrame.remove();
-        adFrame = null;
-        adSlot.dataset.adLoaded = 'false';
-        updateAdSlotVisibility();
-      }
-      activeAdProviderTemplate = nextTemplate;
-      activeAdLayout = nextTemplate.id;
+    const loadAdProvider = () => {
+      if (!navigator.onLine || adFrame || !adContent || !adProviderTemplate) return;
 
       adFrame = document.createElement('iframe');
       adFrame.title = 'إعلان';
-      adFrame.width = nextTemplate.id === 'desktop-ad-provider-template' ? '728' : '320';
-      adFrame.height = nextTemplate.id === 'desktop-ad-provider-template' ? '90' : '50';
+      adFrame.width = '320';
+      adFrame.height = '50';
       adFrame.dataset.adProviderFrame = '';
       adFrame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox');
       adFrame.referrerPolicy = 'strict-origin-when-cross-origin';
-      adFrame.srcdoc = `<!doctype html><html style="background:transparent"><head></head><body style="margin:0;background:transparent"><script>
+      adFrame.srcdoc = `<!doctype html><html><head></head><body style="margin:0"><script>
         (() => {
           let reported = false;
           let loadTimeout;
@@ -2708,70 +2658,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (reported) return;
             reported = true;
             clearTimeout(loadTimeout);
-            parent.postMessage({ type: 'lifecraft-ad-loaded', unit: '${nextTemplate.dataset.adUnitId}' }, '*');
+            parent.postMessage({ type: 'lifecraft-ad-loaded', unit: '6217544' }, '*');
           };
           const inspectCreative = (creative) => {
             const size = creative.getBoundingClientRect();
             if (size.width < 300 || size.height < 40) return;
             const source = creative.getAttribute('src');
+            if (source && source !== 'about:blank') {
+              reportLoaded();
+              return;
+            }
             try {
-              const creativeDocument = creative.contentDocument;
-              const body = creativeDocument?.body;
-              const bodyStyle = body && getComputedStyle(body);
-              const bodyIsVisible = body &&
-                bodyStyle.display !== 'none' &&
-                bodyStyle.visibility !== 'hidden' &&
-                Number(bodyStyle.opacity) > 0;
-              const hasVisibleContent = bodyIsVisible && (
-                body.innerText.trim() ||
-                Array.from(body.querySelectorAll('*')).some((element) => {
-                  const bounds = element.getBoundingClientRect();
-                  const style = getComputedStyle(element);
-                  if (
-                    bounds.width === 0 ||
-                    bounds.height === 0 ||
-                    style.display === 'none' ||
-                    style.visibility === 'hidden' ||
-                    Number(style.opacity) === 0
-                  ) return false;
-
-                  if (style.backgroundImage !== 'none') return true;
-                  if (element instanceof HTMLImageElement) return element.complete && element.naturalWidth > 0;
-                  if (element instanceof HTMLIFrameElement) {
-                    return element.dataset.lifecraftLoaded === 'true' &&
-                      element.getAttribute('src') !== 'about:blank';
-                  }
-                  if (element instanceof HTMLVideoElement) return element.readyState >= 2;
-                  if (element instanceof HTMLCanvasElement) return true;
-                  if (element instanceof SVGElement) return element.childElementCount > 0;
-                  return false;
-                })
-              );
-              if (hasVisibleContent) reportLoaded();
-              else if (!creativeDocument && source && source !== 'about:blank' && creative.dataset.lifecraftLoaded === 'true') {
-                reportLoaded();
-              }
+              const body = creative.contentDocument?.body;
+              if (body && (body.childElementCount > 0 || body.textContent.trim())) reportLoaded();
             } catch (error) {
-              if (
-                error instanceof DOMException &&
-                error.name === 'SecurityError' &&
-                source &&
-                source !== 'about:blank' &&
-                creative.dataset.lifecraftLoaded === 'true'
-              ) {
-                reportLoaded();
-              } else {
-                console.error('Unable to inspect the loaded ad frame:', error);
-              }
+              console.error('Unable to inspect the loaded ad frame:', error);
             }
           };
           const observeCreative = (creative) => {
             if (creative.dataset.lifecraftObserved) return;
             creative.dataset.lifecraftObserved = 'true';
-            creative.addEventListener('load', () => {
-              creative.dataset.lifecraftLoaded = 'true';
-              inspectCreative(creative);
-            });
+            creative.addEventListener('load', () => inspectCreative(creative));
             try {
               const documentElement = creative.contentDocument?.documentElement;
               if (documentElement) {
@@ -2793,43 +2700,52 @@ document.addEventListener('DOMContentLoaded', () => {
           document.addEventListener('error', (event) => {
             const failedScript = event.target;
             if (failedScript instanceof HTMLScriptElement && failedScript.src.startsWith('https://bauval.org/22/')) {
-              parent.postMessage({ type: 'lifecraft-ad-error', unit: '${nextTemplate.dataset.adUnitId}' }, '*');
+              parent.postMessage({ type: 'lifecraft-ad-error', unit: '6217544' }, '*');
             }
           }, true);
           loadTimeout = setTimeout(() => {
-            if (!reported) parent.postMessage({ type: 'lifecraft-ad-empty', unit: '${nextTemplate.dataset.adUnitId}' }, '*');
-          }, 4000);
+            if (!reported) parent.postMessage({ type: 'lifecraft-ad-empty', unit: '6217544' }, '*');
+          }, 20000);
         })();
-      <\/script>${nextTemplate.innerHTML}</body></html>`;
+      <\/script>${adProviderTemplate.innerHTML}</body></html>`;
 
-      adContent.replaceChildren(adFrame);
-      adSlot.dataset.adLoaded = 'false';
-      adLoadTimeout = setTimeout(() => {
-        if (adFrame && adSlot.dataset.adLoaded !== 'true') {
-          console.warn('The ad provider did not return a banner within 4 seconds.');
+      window.addEventListener('message', (event) => {
+        if (
+          event.source !== adFrame?.contentWindow ||
+          !event.data ||
+          event.data.unit !== adProviderTemplate.dataset.adUnitId
+        ) return;
+
+        if (event.data.type === 'lifecraft-ad-error' || event.data.type === 'lifecraft-ad-empty') {
+          if (event.data.type === 'lifecraft-ad-error') {
+            console.error('The ad provider script failed to load.');
+          } else {
+            console.warn('The ad provider did not return a banner.');
+          }
           adFrame.remove();
           adFrame = null;
           updateAdSlotVisibility();
+          return;
         }
-        adLoadTimeout = null;
-      }, 4000);
+
+        if (event.data.type !== 'lifecraft-ad-loaded') return;
+        window.dispatchEvent(new Event('lifecraft:ad-loaded'));
+      });
+
+      adContent.replaceChildren(adFrame);
     };
 
     window.addEventListener('online', () => {
-      loadAdProvider(true);
+      loadAdProvider();
       updateAdSlotVisibility();
     });
     window.addEventListener('offline', () => {
       if (adSlot.dataset.adLoaded !== 'true' && adFrame) {
-        clearAdLoadTimeout();
         adFrame.remove();
         adFrame = null;
-        adSlot.dataset.adLoaded = 'false';
       }
       updateAdSlotVisibility();
     });
-
-    window.addEventListener('resize', loadAdProvider);
 
     if (contractOverlay) {
       new MutationObserver(updateAdSlotVisibility).observe(contractOverlay, {
